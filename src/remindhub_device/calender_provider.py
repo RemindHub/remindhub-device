@@ -5,31 +5,40 @@ from typing import List
 from src.remindhub_device.calender_event import CalenderEvent
 
 
-class CalenderWrapper(ABC):
+class CalenderProvider(ABC):
 
     @property
     def cred_file(self) -> str:
-        return self.cred_file
+        return self._cred_file
 
     @cred_file.setter
     def cred_file(self, cred_file: str) -> None:
-        self.cred_file = cred_file
+        self._cred_file = cred_file
 
     @property
     def calender_url(self) -> str:
-        return self.calender_url
+        return self._calender_url
 
     @calender_url.setter
     def calender_url(self, calender_url: str) -> None:
-        self.calender_url = calender_url
+        self._calender_url = calender_url
 
     @property
     def event_list (self) -> list[CalenderEvent]:
-        return self.event_list
+        return self._event_list
+
+    @event_list.setter
+    def event_list(self, event_list: list[CalenderEvent]) -> None:
+        self._event_list = event_list
+
+    def __init__(self, cred_file: str, calender_url: str) -> None:
+        self.cred_file = cred_file
+        self.calender_url = calender_url
+        self.event_list = []
 
     @abstractmethod
     def fetch_events_from_range(self, start_time: datetime, end_time: datetime) -> List[CalenderEvent]:
         pass
 
     def fetch_events_from_today(self) -> List[CalenderEvent]:
-        return self.fetch_events_from_range(datetime.datetime.today(), datetime.datetime.today())
+        return self.fetch_events_from_range(datetime.datetime.today(), datetime.datetime.today() + datetime.timedelta(days=1))
