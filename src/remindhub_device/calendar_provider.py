@@ -2,10 +2,10 @@ import datetime
 from abc import ABC, abstractmethod
 from typing import List
 
-from src.remindhub_device.calender_event import CalenderEvent
+from calendar_event import CalendarEntry
 
 
-class CalenderProvider(ABC):
+class CalendarProvider(ABC):
 
     @property
     def cred_file(self) -> str:
@@ -24,11 +24,11 @@ class CalenderProvider(ABC):
         self._calender_url = calender_url
 
     @property
-    def event_list (self) -> list[CalenderEvent]:
+    def event_list (self) -> list[CalendarEntry]:
         return self._event_list
 
     @event_list.setter
-    def event_list(self, event_list: list[CalenderEvent]) -> None:
+    def event_list(self, event_list: list[CalendarEntry]) -> None:
         self._event_list = event_list
 
     def __init__(self, cred_file: str, calender_url: str) -> None:
@@ -37,8 +37,8 @@ class CalenderProvider(ABC):
         self.event_list = []
 
     @abstractmethod
-    def fetch_events_from_range(self, start_time: datetime, end_time: datetime) -> List[CalenderEvent]:
+    def fetch_events_from_range(self, start_time: datetime, end_time: datetime) -> List[CalendarEntry]:
         pass
 
-    def fetch_events_from_today(self) -> List[CalenderEvent]:
+    def fetch_events_from_today(self) -> List[CalendarEntry]:
         return self.fetch_events_from_range(datetime.datetime.today(), datetime.datetime.today() + datetime.timedelta(days=1))
