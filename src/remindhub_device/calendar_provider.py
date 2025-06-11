@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, time
 from abc import ABC, abstractmethod
 from typing import List
 
-from calendar_event import CalendarEntry
+from src.remindhub_device.calendar_event import CalendarEntry
 
 
 class CalendarProvider(ABC):
