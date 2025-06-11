@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta, time, timezone
 from abc import ABC, abstractmethod
 from typing import List
 
@@ -41,6 +41,6 @@ class CalendarProvider(ABC):
         pass
 
     def fetch_events_from_today(self) -> List[CalendarEntry]:
-        today = datetime.combine(datetime.today(), time.min)
+        today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
         tomorrow = today + timedelta(days=1)
         return self.fetch_events_from_range(today, tomorrow)

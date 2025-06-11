@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from logging import exception
 from typing import List
 
 from src.remindhub_device.calendar_event import CalendarEntry
@@ -9,7 +8,6 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 
 
 class GoogleCalendarProvider(CalendarProvider):
@@ -24,8 +22,27 @@ class GoogleCalendarProvider(CalendarProvider):
             # TODO: Implement logging system
             return []
 
-        return []
+        service = build('calendar', 'v3', credentials=self.credentials)
 
+        events_result = (
+            service.events()
+            .list(
+                calendarId="primary",
+                timeMin=start_time.isoformat(),
+                timeMax=end_time.isoformat(),
+                maxResults=10,
+                singleEvents=True,
+                orderBy="startTime",
+            )
+            .execute()
+        )
+        events = events_result.get("items", [])
+
+        entry_list = []
+        for event in events:
+            entry_list.append(CalendarEntry(event['summary'], event.get("attendees"), event.get("description"), event.get("start").get("dateTime"), event.get("end").get("dateTime")))
+
+        return entry_list
 
 
     def _authenticate(self):
