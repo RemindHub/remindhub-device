@@ -1,3 +1,4 @@
+import os
 from datetime import datetime, timedelta, time, timezone
 from abc import ABC, abstractmethod
 from typing import List
@@ -6,6 +7,10 @@ from src.remindhub_device.calendar_event import CalendarEntry
 
 
 class CalendarProvider(ABC):
+
+    @property
+    def base_dir(self) -> os.path:
+        return os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, "config", "calendar_credentials"))
 
     @property
     def cred_file(self) -> str:
@@ -31,8 +36,8 @@ class CalendarProvider(ABC):
     def event_list(self, event_list: list[CalendarEntry]) -> None:
         self._event_list = event_list
 
-    def __init__(self, cred_file: str, calender_url: str) -> None:
-        self.cred_file = cred_file
+    def __init__(self, calender_url: str) -> None:
+        self.cred_file = None
         self.calender_url = calender_url
         self.event_list = []
 
