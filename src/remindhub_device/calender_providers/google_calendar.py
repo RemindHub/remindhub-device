@@ -12,30 +12,29 @@ from src.remindhub_device.calendar_event import CalendarEntry
 from src.remindhub_device.calendar_provider import CalendarProvider
 
 
+def _parse_to_calender_entry(events) -> list[CalendarEntry]:
+    entry_list = []
+
+    for event in events:
+        title = event["summary"]
+        description = event["description"]
+        start_time = event["start"].get("dateTime")
+        end_time = event["end"].get("dateTime")
+        attendees = []
+
+        # fetch attendee mail
+        for i in event.get("attendees", []):
+            attendees.append(i["email"])
+
+        entry_list.append(
+            CalendarEntry(title=title, description=description, start_time=start_time, end_time=end_time,
+                          attendees=attendees))
+
+    return entry_list
+
+
 class GoogleCalendarProvider(CalendarProvider):
     _scopes = ['https://www.googleapis.com/auth/calendar.readonly']
-
-
-    def __init__(self, calender_url: str):
-        super().__init__(calender_url)
-        self.cred_file = os.path.join(self.base_dir, "google", "credentials.json")
-        self._token_file = os.path.join(self.base_dir, "google", "token.json")
-
-
-    def fetch_events_from_range(self, start_time: datetime, end_time: datetime) -> List[CalendarEntry]:
-
-        # Authenticate the user
-        self._authenticate()
-
-        if self.credentials is None:
-            print("Credentials not found. Exiting.")
-            # TODO: Implement logging system
-            return []
-
-        events = self._fetch_events(start_time, end_time)
-
-        # Parse calendar events into the CalendarEntries
-        return _parse_to_calender_entry(events)
 
 
     def _authenticate(self):
@@ -90,24 +89,23 @@ class GoogleCalendarProvider(CalendarProvider):
         return events_result.get("items", [])
 
 
-# --- Static-Scope --- #
+    def __init__(self, calender_url: str):
+        super().__init__(calender_url)
+        self.cred_file = os.path.join(self.base_dir, "google", "credentials.json")
+        self._token_file = os.path.join(self.base_dir, "google", "token.json")
 
-def _parse_to_calender_entry(events) -> list[CalendarEntry]:
-    entry_list = []
 
-    for event in events:
-        title = event["summary"]
-        description = event["description"]
-        start_time = event["start"].get("dateTime")
-        end_time = event["end"].get("dateTime")
-        attendees = []
+    def fetch_events_from_range(self, start_time: datetime, end_time: datetime) -> List[CalendarEntry]:
 
-        # fetch attendee mail
-        for i in event.get("attendees", []):
-            attendees.append(i["email"])
+        # Authenticate the user
+        self._authenticate()
 
-        entry_list.append(
-            CalendarEntry(title=title, description=description, start_time=start_time, end_time=end_time,
-                          attendees=attendees))
+        if self.credentials is None:
+            print("Credentials not found. Exiting.")
+            # TODO: Implement logging system
+            return []
 
-    return entry_list
+        events = self._fetch_events(start_time, end_time)
+
+        # Parse calendar events into the CalendarEntries
+        return _parse_to_calender_entry(events)

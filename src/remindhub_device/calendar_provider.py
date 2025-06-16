@@ -1,4 +1,5 @@
 import os
+import typing
 from datetime import datetime, timedelta, time, timezone
 from abc import ABC, abstractmethod
 from typing import List
@@ -13,12 +14,12 @@ class CalendarProvider(ABC):
         return os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir, os.path.pardir, "config", "calendar_credentials"))
 
     @property
-    def cred_file(self) -> str:
-        return self._cred_file
+    def credentials(self) -> dict[str, typing.Any]:
+        return self._credentials
 
-    @cred_file.setter
-    def cred_file(self, cred_file: str) -> None:
-        self._cred_file = cred_file
+    @credentials.setter
+    def credentials(self, cred_file: dict[str, typing.Any]) -> None:
+        self._credentials = cred_file
 
     @property
     def calender_url(self) -> str:
@@ -37,7 +38,7 @@ class CalendarProvider(ABC):
         self._event_list = event_list
 
     def __init__(self, calender_url: str) -> None:
-        self.cred_file = None
+        self.credentials = {}
         self.calender_url = calender_url
         self.event_list = []
 
