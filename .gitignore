@@ -192,3 +192,5 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+/config/calendar_credentials/google/token.json
+/config/calendar_credentials/google/credentials.json
